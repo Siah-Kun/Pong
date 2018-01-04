@@ -20,12 +20,7 @@ public class Rectangle extends Rectangle2D.Double{
     }
 
     @Override
-    public double getY() {
-        return super.getY();
-    }
-
-    public double getX(){
-        return super.getX();
-    }
+    public double getY() {return super.getY();}
+    public double getX(){return super.getX();}
 }
 
