@@ -9,38 +9,111 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
-public class Board extends JPanel implements KeyListener, ActionListener{
+public class Board extends JPanel {
     private BufferedImage background;
 
     //player one information
     private int p1X = 20;
-    private int p1Y = 200;
+    private int p1Y = 150;
     private Rectangle playerOne;
 
     //player two information
-    private int p2X = 860;
-    private int p2Y = 200;
+    private int p2X = 550;
+    private int p2Y = 150;
     private Rectangle playerTwo;
 
     // puck information
-    private int PuckX = 440;
-    private int PuckY = 265;
+    private int PuckX = 290;
+    private int PuckY = 190;
     private Ball Puck;
 
-    private Timer timer = new Timer(1000/100,this);
-
-
-    public Board(){
+    public Board() {
 
         // creating each player and puck
-        playerOne = new Rectangle(p1X,p1Y);
-        playerTwo = new Rectangle(p2X,p2Y);
+        playerOne = new Rectangle(p1X, p1Y);
+        playerTwo = new Rectangle(p2X, p2Y);
         Puck = new Ball(PuckX, PuckY);
+        setDoubleBuffered(true);
 
-        addKeyListener(this);
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
+        addKeyBinding(this, KeyEvent.VK_UP,   "moveUpPressed",  false, (evt) -> {
+            playerOne.setMovingUp(true);
+        });
 
+        addKeyBinding(this, KeyEvent.VK_UP,  "moveUpReleased", true, (evt) -> {
+            playerOne.setMovingUp(false);
+        });
+
+        addKeyBinding(this, KeyEvent.VK_DOWN,   "moveDownPressed",  false, (evt) -> {
+            playerOne.setMovingDown(true);
+        });
+
+        addKeyBinding(this, KeyEvent.VK_DOWN,  "moveDownReleased", true, (evt) -> {
+            playerOne.setMovingDown(false);
+        });
+
+        addKeyBinding(this, KeyEvent.VK_W,  " moveP2UpPressed",  false, (evt) -> {
+            playerTwo.setMovingUp(true);
+        });
+
+        addKeyBinding(this, KeyEvent.VK_W,  " moveP2UpReleased", true, (evt) -> {
+            playerTwo.setMovingUp(false);
+        });
+        addKeyBinding(this, KeyEvent.VK_S,  " moveP2DownPressed",  false, (evt) -> {
+            playerTwo.setMovingDown(true);
+        });
+
+        addKeyBinding(this, KeyEvent.VK_S,  " moveP2DownReleased", true, (evt) -> {
+            playerTwo.setMovingDown(false);
+        });
+
+        // Timer to represent frames per second and constantly check the status of each button pressed
+        Timer timer = new Timer(20, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Move puck
+                Puck.MovePuck(playerOne.getX(), playerOne.getY(), playerTwo.getX(), playerTwo.getY());
+                repaint();
+                //Only move if the player is pressing each button
+                //Player One Moving UP
+                if(playerOne.isMovingUp()){
+                    playerOne.movePlayerUP();
+                }
+
+                //Player One Moving Down
+                if(playerOne.isMovingDown()){
+                    playerOne.movePlayerDown();
+                }
+
+                //Player Two Moving Up
+                if(playerTwo.isMovingUp()){
+                    playerTwo.movePlayerUP();
+                }
+
+                //Player Two Moving Down
+                if(playerTwo.isMovingDown()){
+                    playerTwo.movePlayerDown();
+                }
+            }
+        });
+
+        //Start Timer
+        timer.start();
+    }
+
+    // Created a function that represents adding keybinding. Easier than re-writing a function each time
+    public void addKeyBinding(JComponent comp, int keyCode, String id, boolean movement, ActionListener ActionListener){
+            InputMap im = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+            ActionMap ap = comp.getActionMap();
+
+            im.put(KeyStroke.getKeyStroke(keyCode, 0 ,  movement), id);
+
+            ap.put(id, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ActionListener.actionPerformed(e);
+                    repaint();
+                }
+            });
     }
 
     public void paintComponent(Graphics g) {
@@ -49,8 +122,8 @@ public class Board extends JPanel implements KeyListener, ActionListener{
         setOpaque(false);
 
         // setting background with image
-        background = new BufferedImage(900,550, BufferedImage.TYPE_INT_RGB);
-        g.drawImage(background,0,0, this);
+        background = new BufferedImage(600, 400, BufferedImage.TYPE_INT_RGB);
+        g.drawImage(background, 0, 0, this);
 
         // drawing player one
         g.setColor(Color.blue);
@@ -64,80 +137,19 @@ public class Board extends JPanel implements KeyListener, ActionListener{
         g.setColor(Color.orange);
         ((Graphics2D) g).fill(Puck);
 
-        //drawing middle line
-        g.setColor(Color.white);
-        g.drawLine(450,0,450,550);
-
-        //drawing mid-line and circle
-        g.setColor(Color.white);
-        g.drawOval(350, 175, 200,200);
-
         //Player One Score
         g.setColor(Color.white);
-        g.setFont(new Font("Arial",Font.PLAIN,20));
-        g.drawString(Puck.p1Score(),185,30);
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString(Puck.p1Score(), 100, 30);
 
         //Player Two Score
         g.setColor(Color.white);
-        g.setFont(new Font("Arial",Font.PLAIN,20));
-        g.drawString(Puck.p2Score(),675,30);
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString(Puck.p2Score(), 450, 30);
+
+        g.dispose();
 
     }
-
-
-    public void actionPerformed(ActionEvent event){
-        if(event.getSource() == timer){
-            Puck.MovePuck(playerOne.getX(),playerOne.getY(), playerTwo.getX(), playerTwo.getY());
-            repaint();
-        }
-    }
-
-    public void keyTyped(KeyEvent event){
-        // Move Player One
-        if(event.getKeyCode() == KeyEvent.VK_UP){
-            playerOne.movePlayerUP();
-            repaint();
-        }
-
-        else if(event.getKeyCode() == KeyEvent.VK_DOWN){
-            playerOne.movePlayerDown();
-           // repaint();
-        }
-
-        // Move Player Two
-        else if(event.getKeyCode() == KeyEvent.VK_0){
-            playerTwo.movePlayerUP();
-           // repaint();
-        }
-        else if(event.getKeyCode() == KeyEvent.VK_9){
-            playerTwo.movePlayerDown();
-           // repaint();
-        }
-    }
-    public void keyPressed(KeyEvent event){
-        if(event.getKeyCode() == KeyEvent.VK_UP){
-            playerOne.movePlayerUP();
-           // repaint();
-
-        }
-        else if(event.getKeyCode() == KeyEvent.VK_DOWN){
-            playerOne.movePlayerDown();
-           // repaint();
-        }
-        // Move Player Two
-        else if(event.getKeyCode() == KeyEvent.VK_0){
-            playerTwo.movePlayerUP();
-           // repaint();
-        }
-        else if(event.getKeyCode() == KeyEvent.VK_9){
-            playerTwo.movePlayerDown();
-            //repaint();
-        }
-
-        // Press the Space Bar to Start the timer
-        else if(event.getKeyCode() == KeyEvent.VK_SPACE){
-            timer.start();
-        }
-    }
-    public void keyReleased(KeyEvent event){}
 }
+
+

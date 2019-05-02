@@ -24,16 +24,16 @@ public class Ball extends Ellipse2D.Double{
 
     }
 
-    //function created to move the puck based on the posistion of the Puck, and the Players
+    //function created to move the puck based on the position of the Puck, and the Players
     public void MovePuck(double PlayerX, double PlayerY, double PlayerTwoX, double PlayerTwoY) {
         // automatically move the X values
         if (movementX) {
-            x+=1.25;
-            if (x >= 880) {
+            x+=5;
+            if (x >= 580) {
                 movementX = false;
             }
         } else {
-            x-=1.25;
+            x-=5;
             if (x <= 0) {
                 movementX = true;
             }
@@ -41,24 +41,24 @@ public class Ball extends Ellipse2D.Double{
 
         // automatically move the Y values
         if (movementY) {
-            y+=1.25;
-            if (y >= 510) {
+            y+=2;
+            if (y >= 380) {
                 movementY = false;
             }
         } else {
-            y-=1.5;
+            y-=2;
             if (y <= 0) {
                 movementY = true;
             }
         }
 
         // Make Puck Bounce Off Player One
-        if(x == PlayerX + 20 && y <= PlayerY + 100 && y >= PlayerY){
+        if(x == PlayerX + 10 && y <= PlayerY + 50 && y >= PlayerY){
             movementX = true;
         }
 
         // Make Puck Bounce off Player Two
-        if(x == PlayerTwoX - 20 && y <= PlayerTwoY + 100 && y >= PlayerTwoY){
+        if(x == PlayerTwoX - 10 && y <= PlayerTwoY + 50 && y >= PlayerTwoY){
             movementX = false;
         }
 
@@ -66,7 +66,7 @@ public class Ball extends Ellipse2D.Double{
 
     // function created to keep track of Player One's Score
     public String p1Score(){
-        if(x == 880){
+        if(x == 580){
             p1Number++;
         }
         p1Score = String.valueOf(p1Number);

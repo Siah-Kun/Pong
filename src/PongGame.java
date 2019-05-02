@@ -15,7 +15,7 @@ public class PongGame extends JFrame {
 
         // Create JFrame
         getContentPane();
-        setSize(900,550);
+        setSize(600,400);
         setResizable(false);
         setVisible(true);
 
